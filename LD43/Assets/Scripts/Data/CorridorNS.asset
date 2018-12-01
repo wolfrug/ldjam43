@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b07e037cf4d5d143ac549d778879f0f, type: 3}
+  m_Name: CorridorNS
+  m_EditorClassIdentifier: 
+  name_: room_corridor_n_s
+  exits_: e8030000d0070000
+  prefab_: {fileID: 1501731993646850, guid: 4dacf8aa909a44647a983c8e9fdc97eb, type: 2}
