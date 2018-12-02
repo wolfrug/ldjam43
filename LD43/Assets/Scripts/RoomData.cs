@@ -26,5 +26,8 @@ public class RoomData : ScriptableObjectBase {
         }
         return false;
     }
+    public Exits GetRandomExit(){
+        return exits_[Random.Range(0, exits_.Length)];
+    }
 
 }

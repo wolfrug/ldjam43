@@ -10,5 +10,5 @@ public class FacilityData : ScriptableObjectBase {
     // Allowed connective rooms
     public RoomData[] connectiveRooms_;
     // Max size of facility (minimum = nr of required rooms)
-    public int facilitySize_;
+    public int connectiveRoomAmount_;
 }

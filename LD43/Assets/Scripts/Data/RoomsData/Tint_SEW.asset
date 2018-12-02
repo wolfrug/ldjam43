@@ -9,8 +9,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b07e037cf4d5d143ac549d778879f0f, type: 3}
-  m_Name: RoomN
+  m_Name: Tint_SEW
   m_EditorClassIdentifier: 
-  name_: room_north
-  exits_: e8030000
-  prefab_: {fileID: 1782688937854808, guid: 239c8eab84d37024d8c2e905b9e1a1eb, type: 2}
+  name_: room_tintersection_sew
+  exits_: a00f0000b80b0000e8030000
+  prefab_: {fileID: 1216108147014516, guid: d6440035f90f2f540b85125583829303, type: 2}

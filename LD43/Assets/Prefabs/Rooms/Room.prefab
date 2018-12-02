@@ -709,7 +709,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1782688937854808}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.92}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4961455954126072}
@@ -2121,6 +2121,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomType_: {fileID: 11400000, guid: 55d3167f85f60204c9a14bb091e2ffc9, type: 2}
+  connectedRoomsDebug_: []
+  connectedRoomsDebugDirs_: 
 --- !u!114 &114885273241984492
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2134,10 +2136,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doors:
   - doorObj: {fileID: 1084034709490256}
-    direction: 2000
-  - doorObj: {fileID: 1736044967399224}
     direction: 1000
+  - doorObj: {fileID: 1736044967399224}
+    direction: 2000
   - doorObj: {fileID: 1015655664395296}
-    direction: 4000
-  - doorObj: {fileID: 1214449780473980}
     direction: 3000
+  - doorObj: {fileID: 1214449780473980}
+    direction: 4000

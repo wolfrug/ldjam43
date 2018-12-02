@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 042869afb957f7b4fa4998748e5c7a20, type: 3}
+  m_Name: TestFacility
+  m_EditorClassIdentifier: 
+  name_: 
+  requiredrooms_:
+  - roomName_: RoomW
+    room: {fileID: 11400000, guid: f83f89aa51073bc4ba1dec9dfee5993b, type: 2}
+    amount: 1
+  - roomName_: RoomN
+    room: {fileID: 11400000, guid: 2c8bae9f9027ba845875d7118b4534e7, type: 2}
+    amount: 1
+  - roomName_: RoomE
+    room: {fileID: 11400000, guid: 015f407c62639684cbd969bae94b6ce1, type: 2}
+    amount: 1
+  - roomName_: RoomS
+    room: {fileID: 11400000, guid: c70189371af3ceb4a8cb035a36ed24f8, type: 2}
+    amount: 1
+  connectiveRooms_:
+  - {fileID: 11400000, guid: b2ae723eb5e30cd4e9a09b823176cc42, type: 2}
+  - {fileID: 11400000, guid: cd5afbb597427404488bc18e1dc5fbc2, type: 2}
+  - {fileID: 11400000, guid: 39ab633488fb1fd44937201730a976f3, type: 2}
+  - {fileID: 11400000, guid: 454a5e7a4ba9bf6489302bcef8479548, type: 2}
+  - {fileID: 11400000, guid: ba93e28b644cbcd42b54e3eb605c97b9, type: 2}
+  - {fileID: 11400000, guid: 4e04386317c072a4e956337ac6867922, type: 2}
+  - {fileID: 11400000, guid: 7a7031aaaea300246b831feb1348ff89, type: 2}
+  connectiveRoomAmount_: 5
