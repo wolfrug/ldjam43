@@ -7,6 +7,7 @@ public class Room : MonoBehaviour
 
 
     public RoomData roomType_;
+    public Vector2 coordinate_ = new Vector2(0, 0);
     public Dictionary<Exits, Room> connectedRooms_ = new Dictionary<Exits, Room> { };
     public List<GameObject> connectedRoomsDebug_ = new List<GameObject> { };
     public List<Exits> connectedRoomsDebugDirs_ = new List<Exits> { };
@@ -41,6 +42,29 @@ public class Room : MonoBehaviour
             return true;
         }
     }
+
+    public void AttemptConnectAll(bool connectReverse = true)
+    { // Attempts to connect all exits, based on the coordinate data
+        foreach (Exits exit in roomType_.exits_)
+        {
+            if (!connectedRooms_.ContainsKey(exit))
+            {
+                // See if there's something in that direction
+                if (!FacilitySpawner.TryCoordinatesStatic(this, exit))
+                {
+                    // Find the room that is there, and attempt a double-sided connection
+                    Room occupyingRoom = FacilitySpawner.instance_.ReturnRoomAtCoordinates(FacilitySpawner.GetNewCoordinates(coordinate_, exit));
+                    if (occupyingRoom != null)
+                    {
+                        if (occupyingRoom.roomType_.ContainsExit(FacilitySpawner.GetOppositeExit(exit)))
+                        {
+                            this.AttemptConnectRoom(occupyingRoom, exit, connectReverse);
+                        };
+                    }
+                }
+            }
+        }
+    }
     public Exits GetRandomFreeConnection()
     {
         List<Exits> freeExits = new List<Exits> { };
@@ -49,9 +73,14 @@ public class Room : MonoBehaviour
             if (!connectedRooms_.ContainsKey(exit))
             {
                 // Check if the proposed new location already has something
-                if (FacilitySpawner.TryCoordinatesStatic(exit))
+                if (FacilitySpawner.TryCoordinatesStatic(this, exit))
                 {
-                    freeExits.Add(exit);
+                    // Check if the proposed location would put it outside of the max/min bounds
+                    Vector2 newCoords = FacilitySpawner.GetNewCoordinates(coordinate_, exit);
+                    if (FacilitySpawner.instance_.TryMaxSize(newCoords))
+                    {
+                        freeExits.Add(exit);
+                    };
                 };
             }
         }
@@ -66,6 +95,34 @@ public class Room : MonoBehaviour
             Debug.Log("Found no free exits in room " + this);
             return Exits.NONE;
         }
+    }
+    public Exits[] GetAllFreeExits(bool ignoreConstraints = true)
+    {
+        List<Exits> freeExits = new List<Exits> { };
+        foreach (Exits exit in roomType_.exits_)
+        {
+            if (!connectedRooms_.ContainsKey(exit))
+            {
+                if (ignoreConstraints)
+                {
+                    freeExits.Add(exit);
+                }
+                else
+                {
+                    // Check if the proposed new location already has something
+                    if (FacilitySpawner.TryCoordinatesStatic(this, exit))
+                    {
+                        // Check if the proposed location would put it outside of the max/min bounds
+                        Vector2 newCoords = FacilitySpawner.GetNewCoordinates(coordinate_, exit);
+                        if (FacilitySpawner.instance_.TryMaxSize(newCoords))
+                        {
+                            freeExits.Add(exit);
+                        };
+                    };
+                }
+            }
+        }
+        return freeExits.ToArray();
     }
 
 }

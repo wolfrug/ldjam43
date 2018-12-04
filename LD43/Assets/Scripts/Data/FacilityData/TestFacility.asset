@@ -26,11 +26,30 @@ MonoBehaviour:
     room: {fileID: 11400000, guid: c70189371af3ceb4a8cb035a36ed24f8, type: 2}
     amount: 1
   connectiveRooms_:
-  - {fileID: 11400000, guid: b2ae723eb5e30cd4e9a09b823176cc42, type: 2}
-  - {fileID: 11400000, guid: cd5afbb597427404488bc18e1dc5fbc2, type: 2}
+  - {fileID: 11400000, guid: 7a7031aaaea300246b831feb1348ff89, type: 2}
+  - {fileID: 11400000, guid: 4e04386317c072a4e956337ac6867922, type: 2}
+  - {fileID: 11400000, guid: ba93e28b644cbcd42b54e3eb605c97b9, type: 2}
   - {fileID: 11400000, guid: 39ab633488fb1fd44937201730a976f3, type: 2}
   - {fileID: 11400000, guid: 454a5e7a4ba9bf6489302bcef8479548, type: 2}
-  - {fileID: 11400000, guid: ba93e28b644cbcd42b54e3eb605c97b9, type: 2}
-  - {fileID: 11400000, guid: 4e04386317c072a4e956337ac6867922, type: 2}
-  - {fileID: 11400000, guid: 7a7031aaaea300246b831feb1348ff89, type: 2}
-  connectiveRoomAmount_: 5
+  - {fileID: 11400000, guid: cd5afbb597427404488bc18e1dc5fbc2, type: 2}
+  - {fileID: 11400000, guid: b2ae723eb5e30cd4e9a09b823176cc42, type: 2}
+  - {fileID: 11400000, guid: 375eebf23e7bbbf4b8c9f6cb020fbf79, type: 2}
+  - {fileID: 11400000, guid: 1b17d6fe616d8714a8fd69bd95493f31, type: 2}
+  - {fileID: 11400000, guid: 2c9b2dbd42e81844c915b20ed8327276, type: 2}
+  - {fileID: 11400000, guid: 715b54700d20e874fbba93704cd6ab1f, type: 2}
+  - {fileID: 11400000, guid: 2c9b2dbd42e81844c915b20ed8327276, type: 2}
+  - {fileID: 11400000, guid: 715b54700d20e874fbba93704cd6ab1f, type: 2}
+  - {fileID: 11400000, guid: 375eebf23e7bbbf4b8c9f6cb020fbf79, type: 2}
+  - {fileID: 11400000, guid: 1b17d6fe616d8714a8fd69bd95493f31, type: 2}
+  endingRooms_:
+  - {fileID: 11400000, guid: b89d4177c5494e246ab948fb5f6c8b71, type: 2}
+  - {fileID: 11400000, guid: 20f0b2836939a65419cd002a5a2ec7e7, type: 2}
+  - {fileID: 11400000, guid: 28841ad0363ef2e4988fb03a64c19e57, type: 2}
+  - {fileID: 11400000, guid: caab2e438e18af341b22503720f3453e, type: 2}
+  - {fileID: 11400000, guid: f83f89aa51073bc4ba1dec9dfee5993b, type: 2}
+  - {fileID: 11400000, guid: 015f407c62639684cbd969bae94b6ce1, type: 2}
+  - {fileID: 11400000, guid: 2c8bae9f9027ba845875d7118b4534e7, type: 2}
+  - {fileID: 11400000, guid: c70189371af3ceb4a8cb035a36ed24f8, type: 2}
+  connectiveRoomAmount_: 10
+  maxSizeEastWest_: {x: 10, y: -10}
+  maxSizeNorthSouth_: {x: 10, y: -10}

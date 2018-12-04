@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: Tint_ENS
   m_EditorClassIdentifier: 
   name_: room_tintersection_ens
-  exits_: a00f0000e8030000d0070000
-  prefab_: {fileID: 1134265172418522, guid: 600633c7287b75f4e9401f36d509a23c, type: 2}
+  exits_: b80b0000e8030000d0070000
+  prefab_: {fileID: 1866269690167236, guid: 22955195ffc97dc439121da21c9c7653, type: 2}

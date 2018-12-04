@@ -36,15 +36,17 @@ public class FacilitySpawner : MonoBehaviour
     public float roomSize_ = 5f;
     private List<FacilityRoom> facilityRooms_ = new List<FacilityRoom> { };
     private List<GameObject> facilityObjects_ = new List<GameObject> { };
+    private List<Room> allRooms_ = new List<Room> { };
 
     [SerializeField]
-    private int roomsLeftToSpawn = 0;
+    private int roomsSpawned = 0;
     [SerializeField]
     private int facilityRooms = 0;
     [SerializeField]
     private int roomsUntilFacilityRoom = 0;
+    private bool nextRoomIsFacilityRoom = false;
 
-    public List<Vector2> coordinates_ = new List<Vector2> { };
+    public Dictionary<Room, Vector2> coordinates_ = new Dictionary<Room, Vector2> { };
     // Use this for initialization
     void Awake()
     {
@@ -59,8 +61,12 @@ public class FacilitySpawner : MonoBehaviour
         facilityRooms_.Clear();
         facilityObjects_.Clear();
         coordinates_.Clear();
+        allRooms_.Clear();
+        facilityRooms = 0;
+        roomsSpawned = 0;
+        roomsUntilFacilityRoom = 0;
+        nextRoomIsFacilityRoom = false;
         StopAllCoroutines();
-        roomsLeftToSpawn = data_.connectiveRoomAmount_;
         // Create lists, and set up rooms left to spawn
         foreach (FacilityRoom room in data_.requiredrooms_)
         {
@@ -70,22 +76,35 @@ public class FacilitySpawner : MonoBehaviour
                 facilityRooms_.Add(new FacilityRoom { roomName_ = room.roomName_, room = room.room, amount = room.amount });
                 facilityRooms += room.amount;
             };
-            roomsLeftToSpawn += facilityRooms;
         }
         StartCoroutine(SpawnFacility());
 
     }
 
+    void DespawnFacility(bool startAgain = false)
+    {
+        StopAllCoroutines();
+        foreach (GameObject roomObj in facilityObjects_)
+        {
+            Destroy(roomObj);
+        }
+        if (startAgain)
+        {
+            Start();
+        }
+    }
+
     IEnumerator SpawnFacility()
     { // Spawns the facility, with one random facility room as the first and last placed
-
+        Debug.LogWarning("SPAWNFACILITY COROUTINE RUNNING: THIS WARNING SHOULD ONLY HAPPEN ONCE");
         FacilityRoom firstRoom = GetRandomFacilityRoom(true);
         Room FRRoom = SpawnRoom(firstRoom.room);
+        FRRoom.coordinate_ = new Vector2(0, 0);
         facilityObjects_.Add(FRRoom.gameObject);
-        coordinates_.Add(new Vector2(0, 0));
-        roomsUntilFacilityRoom = roomsLeftToSpawn / facilityRooms;
+        coordinates_.Add(FRRoom, new Vector2(0, 0));
+        roomsUntilFacilityRoom = data_.connectiveRoomAmount_;
         facilityRooms -= 1;
-        roomsLeftToSpawn -= 1;
+        roomsSpawned += 1;
 
         // This is where the next room will be spawned
         Room previousRoom = FRRoom;
@@ -94,6 +113,7 @@ public class FacilitySpawner : MonoBehaviour
 
         while (facilityRooms > 0)
         {
+            yield return new WaitForSeconds(0.1f);
             // Get the next random connective room that fits the previous exit
             nextExit = previousRoom.GetRandomFreeConnection();
             if (nextExit == Exits.NONE)
@@ -110,23 +130,32 @@ public class FacilitySpawner : MonoBehaviour
                 }
                 if (nextExit == Exits.NONE)
                 {
-                    Debug.LogWarning("Couldn't find any more free exits. Oh well");
-                    break;
+                    if (facilityRooms <= 0)
+                    {
+                        Debug.LogWarning("Couldn't find any more free exits. Oh well");
+                        break;
+                    }
+                    else
+                    {// Fucked up - restart whole facility generation!
+                        DespawnFacility(true);
+                    }
                 }
             }
             if (roomsUntilFacilityRoom <= 0)
             {
                 FacilityRoom randomFC = GetRandomFacilityRoom();
-                if (randomFC.room.ContainsExit(GetOppositeExit(nextExit)))
+                if (randomFC != null)
                 {
-                    nextRoom = randomFC.room;
-                    facilityRooms -= 1;
-					CountDownFacilityList(randomFC, 1);
-                    roomsUntilFacilityRoom = roomsLeftToSpawn / facilityRooms;
+                    if (randomFC.room.ContainsExit(GetOppositeExit(nextExit)))
+                    {
+                        nextRoom = randomFC.room;
+                        nextRoomIsFacilityRoom = true;
+                    }
+                    else
+                    {
+                        nextRoom = GetRandomConnectiveRoom(GetOppositeExit(randomFC.room.GetRandomExit()));
+                    }
                 }
-				else {
-					nextRoom = GetRandomConnectiveRoom(GetOppositeExit(randomFC.room.GetRandomExit()));
-				}
             }
             else
             {
@@ -141,24 +170,80 @@ public class FacilitySpawner : MonoBehaviour
                     //Debug.Log(returnRoomGO);
                     if (previousRoom != null)
                     {
-                        if (previousRoom.AttemptConnectRoom(nextRoomRoom, nextExit, true))
-                        {
-                            previousRoom = nextRoomRoom;
-                            facilityObjects_.Add(nextRoomRoom.gameObject);
-                            roomsLeftToSpawn -= 1;
-                            roomsUntilFacilityRoom -= 1;
-                            coordinates_.Add(GetNewCoordinates(coordinates_[coordinates_.Count - 1], nextExit));
+                        /*if (previousRoom.AttemptConnectRoom(nextRoomRoom, nextExit, true))
+                        {*/
+                        coordinates_.Add(nextRoomRoom, GetNewCoordinates(coordinates_[previousRoom], nextExit));
+                        previousRoom = nextRoomRoom;
+                        facilityObjects_.Add(nextRoomRoom.gameObject);
+                        roomsSpawned += 1;
+                        if (nextRoomIsFacilityRoom)
+                        { // Try to count it down, might not work because of...reasons. So check that first.
+                            if (CountDownFacilityList(nextRoomRoom, 1))
+                            {
+                                facilityRooms -= 1;
+                                nextRoomIsFacilityRoom = false;
+                                if (facilityRooms > 0)
+                                {
+                                    roomsUntilFacilityRoom = data_.connectiveRoomAmount_;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
                         }
+                        roomsUntilFacilityRoom -= 1;
+                        /*}
                         else
                         {
-                            Destroy(nextRoomRoom.gameObject);
-                        }
+                            //Destroy(nextRoomRoom.gameObject);
+                        }*/
                     }
                 };
             }
-            yield return new WaitForSeconds(0.1f);
+
         }
         Debug.Log("FINISHED SPAWNING FACILITY!");
+        allRooms_.Clear();
+        foreach (KeyValuePair<Room, Vector2> pair in coordinates_)
+        {
+            allRooms_.Add(pair.Key);
+        }
+        // Attempt to finalize all connections between rooms
+        foreach (Room room in allRooms_)
+        {
+            room.AttemptConnectAll(false);
+            //yield return new WaitForSeconds(0.1f);
+        }
+        Debug.Log("FINISHED CONNECTING ALL");
+        // Attempts to add a blocker (if found) to each remaining empty exit
+
+        foreach (Room room in allRooms_)
+        {
+            foreach (Exits exit in room.GetAllFreeExits())
+            {
+                //yield return new WaitForSeconds(0.1f);
+                bool isTileEmpty = !coordinates_.ContainsValue(GetNewCoordinates(coordinates_[room], exit));
+                RoomData randomBlockerData = GetRandomBlockerRoom(GetOppositeExit(exit), isTileEmpty);
+                if (randomBlockerData != null)
+                {
+                    Room blockerRoom = SpawnRoom(randomBlockerData, room, GetOppositeExit(exit));
+                    if (room.AttemptConnectRoom(blockerRoom, exit, true))
+                    {
+                        coordinates_.Add(blockerRoom, GetNewCoordinates(coordinates_[room], nextExit));
+                        facilityObjects_.Add(blockerRoom.gameObject);
+                        roomsSpawned += 1;
+                    }
+                    /*else
+                    {
+                        Destroy(blockerRoom.gameObject);
+                    }*/
+                }
+            }
+        }
+        Debug.Log("FINISHED ADDING BLOCKERS");
+
+
     }
 
     Room SpawnRoom(RoomData nextRoomData, Room previousRoom = null, Exits exit = Exits.NONE)
@@ -179,7 +264,13 @@ public class FacilitySpawner : MonoBehaviour
         }
         GameObject returnRoomGO = GameObject.Instantiate(nextRoomData.prefab_, GetNewPosition(oldPosition, exit), Quaternion.identity);
         Room returnRoom = returnRoomGO.GetComponent<Room>();
+        // Set room type, and room's new coordinates
         returnRoom.roomType_ = nextRoomData;
+        if (previousRoom != null)
+        {
+            returnRoom.coordinate_ = GetNewCoordinates(coordinates_[previousRoom], GetOppositeExit(exit));
+            returnRoom.gameObject.name = returnRoom.roomType_.name_ + "(" + returnRoom.coordinate_ + ")";
+        }
         return returnRoom;
     }
 
@@ -236,10 +327,16 @@ public class FacilitySpawner : MonoBehaviour
                 }
         }
     }
-    bool TryCoordinates(Exits exit)
+    bool TryCoordinates(Room targetRoom, Exits exit)
     {// Sees if something is already occupying the proposed coordinates
-        Vector2 newCoordinates = GetNewCoordinates(coordinates_[coordinates_.Count - 1], exit);
-        if (coordinates_.Contains(newCoordinates))
+        Vector2 newCoordinates;
+
+        if (coordinates_.ContainsKey(targetRoom))
+        {
+            newCoordinates = GetNewCoordinates(coordinates_[targetRoom], exit);
+        }
+        else { return false; };
+        if (coordinates_.ContainsValue(newCoordinates))
         {
             return false;
         }
@@ -248,10 +345,44 @@ public class FacilitySpawner : MonoBehaviour
             return true;
         }
     }
-    public static bool TryCoordinatesStatic(Exits exit)
-    {
-        return instance_.TryCoordinates(exit);
+    public Room ReturnRoomAtCoordinates(Vector2 coordinates)
+    {// return the room at the coordinates (or null if nothing is found)
+
+        foreach (KeyValuePair<Room, Vector2> pair in coordinates_)
+        {
+            if (pair.Value == coordinates)
+            {
+                return pair.Key;
+            }
+        }
+        return null;
     }
+    public static bool TryCoordinatesStatic(Room targetRoom, Exits exit)
+    {
+        return instance_.TryCoordinates(targetRoom, exit);
+    }
+
+    public bool TryMaxSize(Vector2 testCoords)
+    {// Checks if the coords fit within the max size as set in the data - if not, return false
+        if (testCoords.x > data_.maxSizeNorthSouth_.x)
+        {
+            return false;
+        }
+        if (testCoords.x < data_.maxSizeNorthSouth_.y)
+        {
+            return false;
+        }
+        if (testCoords.y > data_.maxSizeEastWest_.x)
+        {
+            return false;
+        }
+        if (testCoords.y < data_.maxSizeEastWest_.y)
+        {
+            return false;
+        }
+        return true;
+    }
+
     public static Exits GetOppositeExit(Exits exit)
     {// Gets the exit opposite of the one inputed.
         switch (exit)
@@ -286,7 +417,7 @@ public class FacilitySpawner : MonoBehaviour
             FacilityRoom randomFR = facilityRooms_[Random.Range(0, facilityRooms_.Count)];
             if (countDownAndRemove)
             { // Count down the amount and remove the room if there's now less than 1
-				CountDownFacilityList(randomFR, 1);
+                CountDownFacilityList(randomFR, 1);
             }
             return randomFR;
         }
@@ -299,11 +430,26 @@ public class FacilitySpawner : MonoBehaviour
     void CountDownFacilityList(FacilityRoom target, int amount)
     {
         target.amount -= amount;
+        Debug.LogWarning("Removed " + amount + " of Facility Room " + target.roomName_ + " Remaining: " + target.amount);
         if (target.amount < 1)
         {
             facilityRooms_.Remove(target);
             facilityRooms_.RemoveAll(item => item == null);
+            Debug.LogWarning("Last room of type " + target.roomName_ + " placed!");
         }
+    }
+    bool CountDownFacilityList(Room target, int amount)
+    {
+        foreach (FacilityRoom room in facilityRooms_)
+        {
+            if (room.room == target.roomType_)
+            {
+                CountDownFacilityList(room, amount);
+                return true;
+            }
+        }
+        Debug.LogWarning("Tried to remove room " + target.roomType_ + " from Facility list, but target was not found");
+        return false;
     }
     RoomData GetRandomConnectiveRoom(Exits requiredExit)
     {// Gets a random connective room from available ones with all of the required exits
@@ -323,6 +469,35 @@ public class FacilitySpawner : MonoBehaviour
             returnRoom = matchingRooms[Random.Range(0, matchingRooms.Count)];
         }
         Debug.Log("Returning room " + returnRoom + "with the exit " + requiredExit + " to fit " + GetOppositeExit(requiredExit));
+        return returnRoom;
+    }
+    RoomData GetRandomBlockerRoom(Exits requiredExit, bool tileEmpty = true)
+    {
+        // Gets a random blocked/end room from available ones with all of the required exits
+
+        List<RoomData> matchingRooms = new List<RoomData> { };
+        RoomData returnRoom = null;
+
+        foreach (RoomData data in data_.endingRooms_)
+        {
+            if (data.ContainsExit(requiredExit))
+            {
+                // If tile is empty, we add any - otherwise only blockers that don't take up the whole space
+                if (tileEmpty)
+                {
+                    matchingRooms.Add(data);
+                }
+                else if (!tileEmpty && !data.occupiesWholeTile)
+                {
+                    matchingRooms.Add(data);
+                }
+            };
+        }
+        if (matchingRooms.Count > 0)
+        {
+            returnRoom = matchingRooms[Random.Range(0, matchingRooms.Count)];
+        }
+        Debug.Log("Returning ENDING room " + returnRoom + "with the exit " + requiredExit + " to fit " + GetOppositeExit(requiredExit));
         return returnRoom;
     }
 

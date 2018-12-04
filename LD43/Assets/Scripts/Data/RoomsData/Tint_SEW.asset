@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Name: Tint_SEW
   m_EditorClassIdentifier: 
   name_: room_tintersection_sew
-  exits_: a00f0000b80b0000e8030000
-  prefab_: {fileID: 1216108147014516, guid: d6440035f90f2f540b85125583829303, type: 2}
+  exits_: a00f0000b80b0000d0070000
+  prefab_: {fileID: 1114707577459682, guid: 664572a898196194eb509034d5397b0f, type: 2}

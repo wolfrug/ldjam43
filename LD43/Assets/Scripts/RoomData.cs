@@ -17,6 +17,7 @@ public class RoomData : ScriptableObjectBase {
 
     public Exits[] exits_ = { Exits.NONE };
     public GameObject prefab_;
+    public bool occupiesWholeTile = true;
 
     public bool ContainsExit(Exits query) {
         foreach (Exits exit in exits_) {
